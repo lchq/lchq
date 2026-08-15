@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>运费报价查询</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #e8f0fe 0%, #f5f5f5 100%);
+    padding: 16px;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 560px; margin: 0 auto; }
+
+  .header { text-align: center; margin: 20px 0 28px; }
+  .header .logo { font-size: 40px; margin-bottom: 8px; }
+  .header h1 { color: #1a1a1a; font-size: 22px; font-weight: 700; }
+  .header p { color: #999; font-size: 13px; margin-top: 6px; }
+
+  .search-box { position: relative; margin-bottom: 20px; }
+  .search-box .icon {
+    position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+    font-size: 18px; color: #bbb; pointer-events: none;
+  }
+  .search-box input {
+    width: 100%; padding: 15px 16px 15px 46px; font-size: 16px;
+    border: 2px solid #e0e4ea; border-radius: 14px; outline: none;
+    transition: border-color .2s, box-shadow .2s; background: #fff; -webkit-appearance: none;
+  }
+  .search-box input:focus { border-color: #1677ff; box-shadow: 0 0 0 3px rgba(22,119,255,.12); }
+  .search-box input::placeholder { color: #c0c0c0; }
+
+  .dropdown {
+    position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+    background: #fff; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,.12);
+    max-height: 240px; overflow-y: auto; display: none; z-index: 100;
+  }
+  .dropdown div {
+    padding: 13px 18px; cursor: pointer; font-size: 15px; color: #333;
+    border-bottom: 1px solid #f5f5f5; transition: background .15s;
+  }
+  .dropdown div:last-child { border-bottom: none; }
+  .dropdown div:hover, .dropdown div.active { background: #e6f4ff; color: #1677ff; }
+
+  .card {
+    background: #fff; border-radius: 16px; overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0,0,0,.06); display: none;
+    animation: slideUp .3s ease;
+  }
+  .card.show { display: block; }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  .card-header {
+    background: linear-gradient(135deg, #1677ff, #4096ff); color: #fff;
+    padding: 18px 22px; display: flex; align-items: center; gap: 10px;
+  }
+  .card-header .pin { font-size: 22px; }
+  .card-header .title-text { font-size: 18px; font-weight: 600; }
+  .card-header .sub { font-size: 12px; opacity: .8; margin-top: 2px; }
+
+  .card-body { padding: 6px 0; }
+  .row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 22px; border-bottom: 1px solid #f5f5f5; transition: background .15s;
+  }
+  .row:last-child { border-bottom: none; }
+  .row:active { background: #fafafa; }
+  .row .left { display: flex; flex-direction: column; gap: 4px; }
+  .row .type { color: #333; font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+  .row .type .badge { font-size: 11px; background: #f0f5ff; color: #1677ff; padding: 2px 8px; border-radius: 4px; font-weight: 400; }
+  .row .detail { color: #999; font-size: 13px; }
+  .row .price-block { text-align: right; }
+  .row .price { color: #f5222d; font-size: 20px; font-weight: 700; }
+  .row .price small { font-size: 12px; font-weight: 400; color: #f5222d; }
+  .row .unit { color: #bbb; font-size: 12px; margin-top: 2px; }
+
+  .empty { text-align: center; color: #bbb; padding: 48px 20px; display: none; }
+  .empty.show { display: block; }
+  .empty .icon { font-size: 48px; margin-bottom: 12px; }
+  .empty p { font-size: 14px; }
+
+  .footer { text-align: center; color: #ccc; font-size: 12px; margin-top: 40px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">🚛</div>
+    <h1>运费报价查询</h1>
+    <p>输入目的地，秒查各车型报价</p>
+  </div>
+
+  <div class="search-box">
+    <span class="icon">🔍</span>
+    <input type="text" id="searchInput" placeholder="请输入目的地，如：北京" autocomplete="off">
+    <div class="dropdown" id="dropdown"></div>
+  </div>
+
+  <div class="card" id="card">
+    <div class="card-header">
+      <span class="pin">📍</span>
+      <div>
+        <div class="title-text" id="cardTitle"></div>
+        <div class="sub" id="cardSub"></div>
+      </div>
+    </div>
+    <div class="card-body" id="cardBody"></div>
+  </div>
+
+  <div class="empty" id="empty">
+    <div class="icon">🤔</div>
+    <p>未找到该目的地的报价<br>请检查输入是否正确</p>
+  </div>
+
+  <div class="empty" id="hint">
+    <div class="icon">💡</div>
+    <p>输入省市名称开始查询<br>支持模糊搜索，如"新疆""内蒙古"</p>
+  </div>
+
+  <div class="footer">数据仅供参考，最终价格以实际确认为准</div>
+</div>
+
+<script>
+let PRICES = {};
+
+// 从 prices.json 加载数据
+fetch('prices.json')
+  .then(r => r.json())
+  .then(data => { PRICES = data; hint.classList.add('show'); })
+  .catch(() => {
+    document.getElementById('hint').innerHTML = '<div class="icon">⚠️</div><p>价格数据加载失败<br>请检查 prices.json 是否存在</p>';
+    document.getElementById('hint').classList.add('show');
+  });
+
+const input      = document.getElementById('searchInput');
+const dropdown   = document.getElementById('dropdown');
+const card       = document.getElementById('card');
+const cardTitle  = document.getElementById('cardTitle');
+const cardSub    = document.getElementById('cardSub');
+const cardBody   = document.getElementById('cardBody');
+const empty      = document.getElementById('empty');
+const hint       = document.getElementById('hint');
+
+function fmt(n) { return Number(n).toLocaleString('zh-CN', { maximumFractionDigits: 2 }); }
+
+function showResult(key) {
+  const data = PRICES[key];
+  if (!data) { card.classList.remove('show'); empty.classList.add('show'); return; }
+  empty.classList.remove('show');
+
+  let minUnit = Infinity, minType = '';
+  Object.keys(data).forEach(type => {
+    const u = data[type]['价格'] / data[type]['吨位'];
+    if (u < minUnit) { minUnit = u; minType = type; }
+  });
+
+  cardTitle.textContent = key + ' 运费报价';
+  cardSub.textContent = '共 ' + Object.keys(data).length + ' 种车型可选';
+
+  cardBody.innerHTML = Object.keys(data).map(type => {
+    const item = data[type];
+    const unitPrice = fmt((item['价格'] / item['吨位']).toFixed(2));
+    const isBest = type === minType;
+    return `
+      <div class="row">
+        <div class="left">
+          <div class="type">${type} ${isBest ? '<span class="badge">单价最低</span>' : ''}</div>
+          <div class="detail">吨位：${fmt(item['吨位'])} 吨</div>
+        </div>
+        <div class="price-block">
+          <div class="price"><small>¥</small>${fmt(item['价格'])}</div>
+          <div class="unit">≈ ¥${unitPrice}/吨</div>
+        </div>
+      </div>`;
+  }).join('');
+
+  card.classList.add('show');
+}
+
+input.addEventListener('input', function() {
+  const val = this.value.trim();
+  card.classList.remove('show'); empty.classList.remove('show');
+  if (!val) { dropdown.style.display = 'none'; hint.classList.add('show'); return; }
+  hint.classList.remove('show');
+
+  const matches = Object.keys(PRICES).filter(k => k.includes(val));
+  if (matches.length === 0) { dropdown.style.display = 'none'; empty.classList.add('show'); return; }
+
+  dropdown.innerHTML = matches.map((k, i) =>
+    `<div data-key="${k}" ${i === 0 ? 'class="active"' : ''}>${k}</div>`
+  ).join('');
+  dropdown.style.display = 'block';
+});
+
+let activeIdx = 0;
+input.addEventListener('keydown', function(e) {
+  const items = dropdown.querySelectorAll('div');
+  if (!items.length) return;
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    items[activeIdx]?.classList.remove('active');
+    activeIdx = (activeIdx + 1) % items.length;
+    items[activeIdx]?.classList.add('active');
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    items[activeIdx]?.classList.remove('active');
+    activeIdx = (activeIdx - 1 + items.length) % items.length;
+    items[activeIdx]?.classList.add('active');
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    const key = items[activeIdx]?.dataset.key;
+    if (key) { input.value = key; dropdown.style.display = 'none'; showResult(key); }
+  } else if (e.key === 'Escape') { dropdown.style.display = 'none'; }
+});
+
+dropdown.addEventListener('click', function(e) {
+  if (e.target.tagName === 'DIV') {
+    const key = e.target.dataset.key;
+    input.value = key; dropdown.style.display = 'none'; showResult(key);
+  }
+});
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.search-box')) dropdown.style.display = 'none';
+});
+</script>
+</body>
+</html>
