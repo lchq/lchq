@@ -5,255 +5,288 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>运费报价查询</title>
 <style>
+:root {
+  --primary: #1677ff;
+  --primary-light: #e6f4ff;
+  --danger: #ff4d4f;
+  --success: #52c41a;
+  --warning: #faad14;
+  --bg: #f0f2f5;
+  --card: #ffffff;
+  --text: #1a1a1a;
+  --text-secondary: #666666;
+  --text-tertiary: #999999;
+  --border: #e8e8e8;
+  --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 4px 20px rgba(0,0,0,0.12);
+  --radius: 14px;
+}
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f0f2f5; padding: 16px; min-height: 100vh; padding-bottom: 80px; }
-.container { max-width: 540px; margin: 0 auto; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: var(--bg);
+  padding: 16px;
+  min-height: 100vh;
+  color: var(--text);
+  -webkit-tap-highlight-color: transparent;
+}
+.container { max-width: 560px; margin: 0 auto; }
 
-/* 顶部品牌区 */
-.header { text-align: center; margin-bottom: 24px; padding-top: 8px; }
-.header .logo { font-size: 36px; margin-bottom: 8px; }
-.header h1 { color: #1a1a1a; font-size: 22px; font-weight: 700; }
-.header p { color: #999; font-size: 13px; margin-top: 4px; }
+/* Header */
+.header { text-align: center; margin: 12px 0 24px; }
+.header h1 { font-size: 24px; color: var(--text); margin-bottom: 6px; }
+.header p { font-size: 13px; color: var(--text-tertiary); }
 
-/* 搜索框 */
-.search-box { position: relative; margin-bottom: 20px; }
-.search-box .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 18px; color: #bbb; }
-.search-box input { width: 100%; padding: 15px 16px 15px 46px; font-size: 16px; border: 2px solid #e8e8e8; border-radius: 14px; outline: none; transition: border-color .2s, box-shadow .2s; background: #fff; }
-.search-box input:focus { border-color: #1677ff; box-shadow: 0 0 0 3px rgba(22,119,255,.1); }
-.dropdown { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #fff; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,.12); max-height: 240px; overflow-y: auto; display: none; z-index: 100; }
-.dropdown div { padding: 13px 18px; cursor: pointer; font-size: 15px; border-bottom: 1px solid #f5f5f5; }
-.dropdown div:last-child { border-bottom: none; }
-.dropdown div:hover, .dropdown div.active { background: #e6f4ff; color: #1677ff; }
+/* Search */
+.search-box { position: relative; margin-bottom: 16px; }
+.search-box .input-wrap { position: relative; }
+.search-box input {
+  width: 100%; padding: 15px 44px 15px 18px; font-size: 16px;
+  border: 2px solid var(--border); border-radius: var(--radius);
+  outline: none; transition: border-color .2s, box-shadow .2s;
+  background: var(--card); color: var(--text);
+}
+.search-box input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(22,119,255,0.1); }
+.search-box input::placeholder { color: #bbb; }
+.clear-btn {
+  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  width: 22px; height: 22px; border: none; border-radius: 50%;
+  background: #ddd; color: #fff; font-size: 14px; cursor: pointer;
+  display: none; align-items: center; justify-content: center;
+  line-height: 1;
+}
+.clear-btn.show { display: flex; }
+.clear-btn:active { background: #bbb; }
+.dropdown {
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+  background: var(--card); border-radius: var(--radius);
+  box-shadow: var(--shadow-lg); max-height: 240px; overflow-y: auto;
+  display: none; z-index: 100; padding: 6px;
+}
+.dropdown.show { display: block; }
+.dropdown div {
+  padding: 12px 14px; cursor: pointer; font-size: 15px;
+  border-radius: 8px; transition: background .15s;
+}
+.dropdown div:hover, .dropdown div.active { background: var(--primary-light); color: var(--primary); }
 
-/* 结果卡片 */
-.card { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,.06); display: none; animation: slideUp .3s ease; }
+/* Card */
+.card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); display: none; overflow: hidden; animation: slideUp .3s ease; }
 .card.show { display: block; }
 @keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-.card-header { background: linear-gradient(135deg, #1677ff, #4096ff); color: #fff; padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; }
-.card-header .title { font-size: 18px; font-weight: 700; }
-.card-header .badge { background: rgba(255,255,255,.25); padding: 3px 10px; border-radius: 20px; font-size: 12px; }
+.card-header { background: linear-gradient(135deg, var(--primary), #4096ff); color: #fff; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+.card-header h2 { font-size: 18px; font-weight: 600; }
+.card-header .count { font-size: 13px; opacity: .8; }
 .card-body { padding: 4px 0; }
-.row { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid #f7f7f7; transition: background .15s; }
+.row { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-bottom: 1px solid #f5f5f5; transition: background .15s; }
 .row:last-child { border-bottom: none; }
-.row:hover { background: #fafcff; }
-.row .left { display: flex; align-items: center; gap: 10px; }
-.row .train-icon { font-size: 22px; }
-.row .type-info .type-name { color: #333; font-size: 15px; font-weight: 600; }
-.row .type-info .type-detail { color: #999; font-size: 12px; margin-top: 3px; }
-.row .right { text-align: right; }
-.row .price { color: #f5222d; font-size: 20px; font-weight: 800; }
-.row .price-unit { color: #f5222d; font-size: 12px; }
-.row .per-ton { color: #52c41a; font-size: 12px; margin-top: 3px; }
-.row.best .type-name::after { content: " ⭐"; }
+.row:active { background: #fafafa; }
+.row .left { display: flex; flex-direction: column; gap: 4px; }
+.row .type { font-size: 15px; font-weight: 500; color: var(--text); display: flex; align-items: center; gap: 6px; }
+.row .detail { font-size: 12px; color: var(--text-tertiary); }
+.row .price { font-size: 20px; font-weight: 700; color: var(--danger); }
+.row .unit-price { font-size: 11px; color: var(--text-tertiary); text-align: right; margin-top: 2px; }
+.star { color: var(--warning); font-size: 14px; }
 
-/* 空状态 */
-.empty { text-align: center; padding: 60px 20px; color: #bbb; }
-.empty .icon { font-size: 48px; margin-bottom: 12px; }
-.empty p { font-size: 15px; }
+/* Share bar */
+.share-bar { display: flex; gap: 10px; margin-top: 16px; }
+.share-bar button {
+  flex: 1; padding: 12px; border: 1px solid var(--border); border-radius: 10px;
+  background: var(--card); font-size: 14px; cursor: pointer; color: var(--text-secondary);
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: all .2s;
+}
+.share-bar button:active { background: var(--primary-light); border-color: var(--primary); color: var(--primary); }
 
-/* 提示 */
-.hint { text-align: center; color: #bbb; margin-top: 40px; font-size: 13px; line-height: 1.8; }
-.hint .dot { margin: 0 6px; }
-
-/* 底部操作栏 */
-.bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid #eee; padding: 10px 16px; display: none; justify-content: space-around; align-items: center; z-index: 50; padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
-.bottom-bar.show { display: flex; }
-.bottom-bar button { flex: 1; margin: 0 6px; padding: 10px 0; border: none; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: opacity .2s; }
-.bottom-bar button:active { opacity: .7; }
-.btn-copy { background: #e6f4ff; color: #1677ff; }
-.btn-qrcode { background: #f0f5ff; color: #5b6abf; }
-.btn-wechat { background: #e8f8e8; color: #18ad18; }
-
-/* 弹窗通用 */
-.modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.45); z-index: 200; justify-content: center; align-items: center; animation: fadeIn .2s; }
-.modal-overlay.show { display: flex; }
+/* Modal */
+.modal-overlay {
+  display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.45); z-index: 1000; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.show { display: flex; animation: fadeIn .2s; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-.modal { background: #fff; border-radius: 16px; padding: 24px; width: 90%; max-width: 400px; max-height: 85vh; overflow-y: auto; animation: popIn .25s; }
-@keyframes popIn { from { opacity: 0; transform: scale(.92); } to { opacity: 1; transform: scale(1); } }
-.modal h3 { margin-bottom: 16px; font-size: 17px; color: #333; text-align: center; }
-.modal .close-btn { float: right; cursor: pointer; font-size: 20px; color: #999; margin-top: -8px; }
-.modal .close-btn:hover { color: #333; }
+.modal { background: var(--card); border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; animation: zoomIn .25s; }
+@keyframes zoomIn { from { transform: scale(.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.modal h3 { margin-bottom: 16px; font-size: 17px; text-align: center; }
+.modal input {
+  width: 100%; padding: 12px 14px; font-size: 15px; border: 1.5px solid var(--border);
+  border-radius: 10px; outline: none; margin-bottom: 12px; transition: border-color .2s;
+}
+.modal input:focus { border-color: var(--primary); }
+.modal-actions { display: flex; gap: 10px; margin-top: 8px; }
+.modal-actions button { flex: 1; padding: 12px; border-radius: 10px; font-size: 15px; cursor: pointer; border: none; }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:active { background: #0958d8; }
+.btn-cancel { background: #f5f5f5; color: var(--text-secondary); }
+.btn-cancel:active { background: #e8e8e8; }
 
-/* 二维码弹窗 */
-.qr-wrap { text-align: center; }
-.qr-wrap img { width: 200px; height: 200px; border: 1px solid #eee; border-radius: 8px; }
-.qr-wrap p { color: #666; font-size: 13px; margin-top: 12px; word-break: break-all; }
-
-/* 登录弹窗 */
-.login-modal .modal { max-width: 340px; }
-.login-modal input { width: 100%; padding: 12px 14px; font-size: 15px; border: 2px solid #e8e8e8; border-radius: 10px; outline: none; margin-bottom: 16px; transition: border-color .2s; }
-.login-modal input:focus { border-color: #1677ff; }
-.login-modal button { width: 100%; padding: 12px; background: #1677ff; color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; }
-.login-modal button:active { opacity: .85; }
-.login-error { color: #f5222d; font-size: 13px; margin-bottom: 12px; display: none; }
-
-/* 管理后台 */
-.admin-panel { display: none; }
-.admin-panel.show { display: block; }
-.admin-header { background: linear-gradient(135deg, #1a1a2e, #2d2d5e); color: #fff; padding: 16px 20px; border-radius: 14px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
-.admin-header h2 { font-size: 16px; }
-.admin-header button { background: rgba(255,255,255,.2); color: #fff; border: none; padding: 6px 12px; border-radius: 8px; font-size: 13px; cursor: pointer; }
-.admin-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-.admin-actions button { padding: 12px; border: none; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
-.btn-add { background: #1677ff; color: #fff; grid-column: 1 / -1; }
-.btn-export { background: #f0f5ff; color: #5b6abf; }
-.btn-import { background: #f0fff0; color: #18a018; }
-.btn-reset { background: #fff7e6; color: #d48806; }
-
-/* 省市列表（管理） */
-.city-list { margin-bottom: 16px; }
-.city-card { background: #fff; border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; box-shadow: 0 1px 4px rgba(0,0,0,.04); }
-.city-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-.city-card-header .city-name { font-size: 16px; font-weight: 700; color: #333; }
-.city-card-header .city-actions button { background: none; border: none; font-size: 16px; cursor: pointer; padding: 4px 8px; border-radius: 6px; }
-.city-card-header .city-actions button:hover { background: #f5f5f5; }
-.city-types { display: flex; flex-wrap: wrap; gap: 6px; }
-.city-types .tag { background: #f0f5ff; color: #5b6abf; padding: 3px 10px; border-radius: 6px; font-size: 12px; }
-
-/* 编辑表单 */
-.edit-form { margin-bottom: 16px; }
-.edit-form label { display: block; font-size: 13px; color: #666; margin-bottom: 4px; margin-top: 10px; }
-.edit-form input { width: 100%; padding: 10px 12px; font-size: 14px; border: 2px solid #e8e8e8; border-radius: 8px; outline: none; transition: border-color .2s; }
-.edit-form input:focus { border-color: #1677ff; }
-.edit-form .save-btn { width: 100%; margin-top: 14px; padding: 12px; background: #1677ff; color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; }
-.type-rows { margin-top: 8px; }
-.type-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
-.type-row input { flex: 1; padding: 8px 10px; font-size: 13px; border: 2px solid #e8e8e8; border-radius: 8px; outline: none; }
-.type-row .remove-type { background: #fff1f0; color: #f5222d; border: none; padding: 8px 10px; border-radius: 8px; cursor: pointer; font-size: 13px; }
-.add-type-btn { background: #f0f5ff; color: #1677ff; border: 1px dashed #1677ff; padding: 8px; border-radius: 8px; width: 100%; cursor: pointer; font-size: 13px; margin-top: 4px; }
-
-/* 日志 */
-.log-section { background: #fff; border-radius: 12px; padding: 14px 16px; margin-bottom: 16px; }
-.log-section h3 { font-size: 14px; color: #666; margin-bottom: 10px; }
-.log-list { max-height: 150px; overflow-y: auto; }
-.log-item { font-size: 12px; color: #999; padding: 4px 0; border-bottom: 1px solid #f5f5f5; }
-.log-item:last-child { border-bottom: none; }
-
-/* 版本号触发区 */
-.version-trigger { position: fixed; bottom: 4px; right: 8px; font-size: 10px; color: #ddd; cursor: pointer; z-index: 300; user-select: none; }
-.version-trigger:active { color: #999; }
+/* QR */
+.qr-wrap { text-align: center; padding: 10px 0; }
+.qr-wrap img { width: 200px; height: 200px; border: 1px solid var(--border); border-radius: 10px; }
+.qr-wrap p { font-size: 13px; color: var(--text-tertiary); margin-top: 10px; word-break: break-all; }
+.qr-fallback { width: 200px; height: 200px; border: 2px dashed var(--border); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 14px; margin: 0 auto; }
 
 /* Toast */
-.toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,.75); color: #fff; padding: 12px 24px; border-radius: 10px; font-size: 14px; z-index: 999; display: none; animation: fadeIn .2s; }
-.toast.show { display: block; }
+.toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: rgba(0,0,0,0.75); color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 14px; z-index: 2000; display: none; }
+.toast.show { display: block; animation: fadeIn .2s; }
+
+/* Empty */
+.empty { text-align: center; padding: 48px 20px; color: var(--text-tertiary); }
+.empty .icon { font-size: 40px; margin-bottom: 12px; }
+.empty p { font-size: 14px; line-height: 1.6; }
+
+/* Footer */
+.footer { text-align: center; margin-top: 32px; padding-bottom: 20px; }
+.footer .version { font-size: 12px; color: #ccc; cursor: pointer; user-select: none; }
+
+/* ===== ADMIN PANEL ===== */
+.admin-panel { display: none; margin-top: 20px; }
+.admin-panel.show { display: block; }
+.admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.admin-header h2 { font-size: 18px; color: var(--primary); }
+.admin-header .admin-actions { display: flex; gap: 8px; }
+.admin-header button { padding: 8px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; border: none; }
+.btn-add { background: var(--primary); color: #fff; }
+.btn-export { background: #f5f5f5; color: var(--text); }
+.btn-import { background: #f5f5f5; color: var(--text); }
+.btn-reset { background: #fff2f0; color: var(--danger); border: 1px solid #ffccc7 !important; }
+.btn-logout { background: #f5f5f5; color: var(--text-secondary); }
+
+.admin-list { display: flex; flex-direction: column; gap: 10px; }
+.admin-item { background: var(--card); border-radius: 12px; padding: 14px 16px; box-shadow: var(--shadow); display: flex; justify-content: space-between; align-items: center; }
+.admin-item .info { flex: 1; }
+.admin-item .info .name { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.admin-item .info .types { font-size: 12px; color: var(--text-tertiary); }
+.admin-item .actions { display: flex; gap: 6px; }
+.admin-item .actions button { padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; border: 1px solid var(--border); background: #fff; }
+.admin-item .actions .edit-btn { color: var(--primary); border-color: #91caff; }
+.admin-item .actions .del-btn { color: var(--danger); border-color: #ffccc7; }
+
+/* Edit form */
+.edit-form { background: var(--card); border-radius: 12px; padding: 20px; box-shadow: var(--shadow); margin-bottom: 16px; display: none; }
+.edit-form.show { display: block; }
+.edit-form h3 { margin-bottom: 14px; font-size: 16px; }
+.edit-form label { display: block; font-size: 13px; color: var(--text-secondary); margin-bottom: 4px; margin-top: 10px; }
+.edit-form input { width: 100%; padding: 10px 12px; font-size: 14px; border: 1.5px solid var(--border); border-radius: 8px; outline: none; }
+.edit-form input:focus { border-color: var(--primary); }
+.edit-form .type-row { display: flex; gap: 8px; align-items: flex-end; margin-top: 10px; }
+.edit-form .type-row input { flex: 1; }
+.edit-form .type-row button { padding: 10px 12px; border-radius: 8px; border: 1px solid var(--danger); background: #fff; color: var(--danger); cursor: pointer; white-space: nowrap; }
+.edit-form .form-actions { display: flex; gap: 10px; margin-top: 16px; }
+.edit-form .form-actions button { flex: 1; padding: 12px; border-radius: 8px; font-size: 14px; cursor: pointer; border: none; }
+.form-save { background: var(--primary); color: #fff; }
+.form-cancel { background: #f5f5f5; color: var(--text-secondary); }
+
+/* Log */
+.log-box { background: #1e1e1e; border-radius: 10px; padding: 14px; margin-top: 16px; max-height: 160px; overflow-y: auto; }
+.log-box .log-title { color: #aaa; font-size: 12px; margin-bottom: 8px; }
+.log-box .log-item { color: #4af626; font-size: 12px; font-family: monospace; line-height: 1.8; }
+
+/* File input hidden */
+.hidden { display: none; }
 </style>
 </head>
 <body>
-
 <div class="container">
-  <!-- 顶部 -->
-  <div class="header" id="mainHeader">
-    <div class="logo">🚂</div>
-    <h1>运费报价查询</h1>
+  <div class="header">
+    <h1>🚂 运费报价查询</h1>
     <p>输入目的地，秒查各车型报价</p>
   </div>
 
-  <!-- 搜索 -->
-  <div class="search-box" id="searchBox">
-    <span class="search-icon">🔍</span>
-    <input type="text" id="searchInput" placeholder="请输入目的地，如：北京" autocomplete="off">
+  <!-- Search -->
+  <div class="search-box">
+    <div class="input-wrap">
+      <input type="text" id="searchInput" placeholder="输入省市名称，如：北京" autocomplete="off">
+      <button class="clear-btn" id="clearBtn">✕</button>
+    </div>
     <div class="dropdown" id="dropdown"></div>
   </div>
 
-  <!-- 结果卡片 -->
+  <!-- Result Card -->
   <div class="card" id="card">
     <div class="card-header">
-      <span class="title" id="cardTitle"></span>
-      <span class="badge" id="cardCount"></span>
+      <h2 id="cardTitle"></h2>
+      <span class="count" id="cardCount"></span>
     </div>
     <div class="card-body" id="cardBody"></div>
   </div>
 
-  <!-- 空状态 -->
-  <div class="empty" id="emptyState">
-    <div class="icon">🤔</div>
-    <p>未找到该目的地的报价</p>
-    <p style="font-size:13px;margin-top:4px;">请检查输入是否正确</p>
+  <!-- Share Bar -->
+  <div class="share-bar" id="shareBar" style="display:none;">
+    <button id="btnCopy">📋 复制链接</button>
+    <button id="btnQR">🔗 二维码</button>
+    <button id="btnWechat">💬 微信转发</button>
   </div>
 
-  <!-- 初始提示 -->
-  <div class="hint" id="initHint">
-    💡 输入省市名称开始查询<br>
-    支持模糊搜索，如"新疆""内蒙古"
-    <p style="margin-top:8px;font-size:12px;color:#ccc;">数据仅供参考，最终价格以实际确认为准</p>
+  <!-- Empty / Hint -->
+  <div class="empty" id="emptyHint">
+    <div class="icon">💡</div>
+    <p>输入省市名称开始查询<br>支持模糊搜索，如"新疆""内蒙古"</p>
   </div>
 
-  <!-- 管理后台 -->
+  <!-- Admin Panel -->
   <div class="admin-panel" id="adminPanel">
     <div class="admin-header">
       <h2>⚙️ 管理后台</h2>
-      <button onclick="exitAdmin()">退出</button>
+      <div class="admin-actions">
+        <button class="btn-add" id="btnAdd">＋ 新增省市</button>
+        <button class="btn-export" id="btnExport">⬇️ 导出</button>
+        <button class="btn-import" id="btnImport">⬆️ 导入</button>
+        <button class="btn-reset" id="btnReset">🔄 重置</button>
+        <button class="btn-logout" id="btnLogout">退出</button>
+      </div>
     </div>
 
-    <div class="admin-actions">
-      <button class="btn-add" onclick="showAddCity()">＋ 新增省市</button>
-      <button class="btn-export" onclick="exportData()">⬇️ 导出备份</button>
-      <button class="btn-import" onclick="document.getElementById('importFile').click()">⬆️ 导入备份</button>
-      <button class="btn-reset" onclick="resetData()">🔄 恢复默认</button>
-    </div>
-    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
-
-    <!-- 新增/编辑表单 -->
-    <div class="edit-form" id="editForm" style="display:none; background:#fff; border-radius:12px; padding:16px; margin-bottom:16px; box-shadow:0 1px 4px rgba(0,0,0,.04);">
+    <!-- Edit Form -->
+    <div class="edit-form" id="editForm">
+      <h3 id="formTitle">新增省市</h3>
       <label>省市名称</label>
-      <input type="text" id="formCityName" placeholder="如：北京">
-      <label>车型与价格</label>
-      <div class="type-rows" id="typeRows"></div>
-      <button class="add-type-btn" onclick="addTypeRow()">＋ 添加车型</button>
-      <button class="save-btn" onclick="saveCity()">💾 保存</button>
+      <input type="text" id="formName" placeholder="如：北京">
+      <div id="formTypes"></div>
+      <button type="button" id="btnAddType" style="margin-top:12px;padding:8px 14px;border:1px dashed #91caff;background:#f0f8ff;color:#1677ff;border-radius:8px;cursor:pointer;font-size:13px;">＋ 添加车型</button>
+      <div class="form-actions">
+        <button class="form-cancel" id="formCancel">取消</button>
+        <button class="form-save" id="formSave">保存</button>
+      </div>
     </div>
 
-    <!-- 省市列表 -->
-    <div class="city-list" id="cityList"></div>
+    <div class="admin-list" id="adminList"></div>
 
-    <!-- 操作日志 -->
-    <div class="log-section">
-      <h3>📋 操作日志</h3>
-      <div class="log-list" id="logList"></div>
+    <div class="log-box">
+      <div class="log-title">📋 操作日志</div>
+      <div class="log-item" id="logList">暂无操作记录</div>
     </div>
+  </div>
+
+  <div class="footer">
+    <span class="version" id="versionTag" title="连点5次进入管理端">v5.1 🚂</span>
   </div>
 </div>
 
-<!-- 底部操作栏 -->
-<div class="bottom-bar" id="bottomBar">
-  <button class="btn-copy" onclick="copyLink()">📋 复制链接</button>
-  <button class="btn-qrcode" onclick="showQR()">🔗 二维码</button>
-  <button class="btn-wechat" onclick="shareWechat()">💬 微信转发</button>
-</div>
-
-<!-- 二维码弹窗 -->
-<div class="modal-overlay" id="qrModal" onclick="if(event.target===this)hideQR()">
-  <div class="modal qr-wrap">
-    <span class="close-btn" onclick="hideQR()">✕</span>
-    <h3>📱 扫码查询运费</h3>
-    <div id="qrCode"></div>
-    <p id="qrUrl"></p>
-  </div>
-</div>
-
-<!-- 登录弹窗 -->
-<div class="modal-overlay login-modal" id="loginModal">
+<!-- QR Modal -->
+<div class="modal-overlay" id="qrModal">
   <div class="modal">
-    <h3>🔐 管理端登录</h3>
-    <div class="login-error" id="loginError">密码错误，请重试</div>
-    <input type="password" id="loginPwd" placeholder="请输入管理密码" onkeydown="if(event.key==='Enter')doLogin()">
-    <button onclick="doLogin()">登 录</button>
+    <h3>📱 扫码访问</h3>
+    <div class="qr-wrap" id="qrWrap"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" id="qrClose">关闭</button>
+    </div>
   </div>
 </div>
 
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
-<!-- 版本触发 -->
-<div class="version-trigger" id="versionTrigger" onclick="handleVersionClick()">v4.0 🚂</div>
+<!-- Hidden file input -->
+<input type="file" id="fileInput" class="hidden" accept=".json">
 
 <script>
-// ========== 配置区 ==========
-const ADMIN_PASSWORD = "admin123";  // ← 改这里换密码
-const STORAGE_KEY = "freight_prices_v4";
-const LOG_KEY = "freight_logs_v4";
+// ===== CONFIG =====
+const ADMIN_PASSWORD = "admin123";
+const STORAGE_KEY = "freight_prices_v5";
+const LOG_KEY = "freight_logs_v5";
 
-// ========== 默认数据（去掉了顶开门） ==========
 const DEFAULT_DATA = {
   "北京": {
     "整车":   { "价格": 13496, "吨位": 225 },
@@ -276,8 +309,8 @@ const DEFAULT_DATA = {
     "敞顶箱": { "价格": 11500, "吨位": 210 }
   },
   "四川": {
-    "整车":   { "价格": 12000, "吨位": 205 },
-    "敞顶箱": { "价格": 13500, "吨位": 225 }
+    "整车":   { "价格": 12500, "吨位": 220 },
+    "敞顶箱": { "价格": 13800, "吨位": 240 }
   },
   "新疆": {
     "整车":   { "价格": 18500, "吨位": 260 },
@@ -289,272 +322,333 @@ const DEFAULT_DATA = {
   }
 };
 
-// ========== 数据管理 ==========
-function getPrices() {
+// ===== STATE =====
+let prices = {};
+let logs = [];
+let adminMode = false;
+let editKey = null; // null=add, string=edit existing key
+let dropdownIndex = -1;
+
+// ===== INIT =====
+function init() {
+  loadData();
+  loadLogs();
+  renderAdminList();
+  bindEvents();
+}
+
+function loadData() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch(e) {}
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DATA));
-  return JSON.parse(JSON.stringify(DEFAULT_DATA));
+    const saved = localStorage.getItem(STORAGE_KEY);
+    prices = saved ? JSON.parse(saved) : { ...DEFAULT_DATA };
+  } catch { prices = { ...DEFAULT_DATA }; }
 }
 
-function setPrices(data) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(prices));
 }
 
-function getLogs() {
-  try { return JSON.parse(localStorage.getItem(LOG_KEY) || "[]"); } catch(e) { return []; }
+function loadLogs() {
+  try {
+    const saved = localStorage.getItem(LOG_KEY);
+    logs = saved ? JSON.parse(saved) : [];
+  } catch { logs = []; }
+  renderLogs();
 }
 
 function addLog(msg) {
-  const logs = getLogs();
-  logs.unshift({ time: new Date().toLocaleString("zh-CN"), msg });
-  if (logs.length > 50) logs.length = 50;
+  const time = new Date().toLocaleString('zh-CN', { year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit' });
+  logs.unshift(`[${time}] ${msg}`);
+  if (logs.length > 50) logs = logs.slice(0, 50);
   localStorage.setItem(LOG_KEY, JSON.stringify(logs));
+  renderLogs();
 }
 
-// ========== 搜索与展示 ==========
-const input = document.getElementById('searchInput');
-const dropdown = document.getElementById('dropdown');
-const card = document.getElementById('card');
-const emptyState = document.getElementById('emptyState');
-const initHint = document.getElementById('initHint');
-const bottomBar = document.getElementById('bottomBar');
+function renderLogs() {
+  const el = document.getElementById('logList');
+  el.innerHTML = logs.length ? logs.join('<br>') : '暂无操作记录';
+}
 
-let currentData = getPrices();
-let activeIdx = -1;
+// ===== EVENTS =====
+function bindEvents() {
+  const input = document.getElementById('searchInput');
+  const clearBtn = document.getElementById('clearBtn');
+  const dropdown = document.getElementById('dropdown');
 
-input.addEventListener('input', function() {
-  const val = this.value.trim();
-  if (!val) { dropdown.style.display = 'none'; card.classList.remove('show'); emptyState.style.display = 'none'; initHint.style.display = 'block'; bottomBar.classList.remove('show'); return; }
-  const matches = Object.keys(currentData).filter(k => k.includes(val));
-  if (matches.length === 0) { dropdown.style.display = 'none'; card.classList.remove('show'); emptyState.style.display = 'block'; initHint.style.display = 'none'; bottomBar.classList.remove('show'); return; }
-  activeIdx = -1;
-  dropdown.innerHTML = matches.map((k, i) => `<div data-key="${k}" data-idx="${i}">🚂 ${k}</div>`).join('');
-  dropdown.style.display = 'block';
-});
+  input.addEventListener('input', onInput);
+  input.addEventListener('keydown', onKeydown);
+  clearBtn.addEventListener('click', () => { input.value=''; clearBtn.classList.remove('show'); document.getElementById('card').classList.remove('show'); document.getElementById('shareBar').style.display='none'; document.getElementById('emptyHint').style.display='block'; dropdown.classList.remove('show'); });
 
-dropdown.addEventListener('click', function(e) {
-  if (e.target.tagName === 'DIV') {
-    selectCity(e.target.dataset.key);
+  // Click outside
+  document.addEventListener('click', e => { if (!e.target.closest('.search-box')) dropdown.classList.remove('show'); });
+
+  // Share buttons
+  document.getElementById('btnCopy').addEventListener('click', copyLink);
+  document.getElementById('btnQR').addEventListener('click', showQR);
+  document.getElementById('qrClose').addEventListener('click', () => document.getElementById('qrModal').classList.remove('show'));
+  document.getElementById('btnWechat').addEventListener('click', wechatShare);
+
+  // Admin
+  document.getElementById('versionTag').addEventListener('click', onVersionClick);
+  document.getElementById('btnAdd').addEventListener('click', () => openForm(null));
+  document.getElementById('btnExport').addEventListener('click', exportData);
+  document.getElementById('btnImport').addEventListener('click', () => document.getElementById('fileInput').click());
+  document.getElementById('fileInput').addEventListener('change', importData);
+  document.getElementById('btnReset').addEventListener('click', resetData);
+  document.getElementById('btnLogout').addEventListener('click', () => { adminMode=false; document.getElementById('adminPanel').classList.remove('show'); });
+
+  document.getElementById('formCancel').addEventListener('click', () => document.getElementById('editForm').classList.remove('show'));
+  document.getElementById('formSave').addEventListener('click', saveForm);
+  document.getElementById('btnAddType').addEventListener('click', addTypeRow);
+}
+
+// Version click → admin
+let clickCount = 0, clickTimer = null;
+function onVersionClick() {
+  clickCount++;
+  clearTimeout(clickTimer);
+  clickTimer = setTimeout(() => clickCount = 0, 2000);
+  if (clickCount >= 5) { clickCount = 0; promptPassword(); }
+}
+
+function promptPassword() {
+  const pw = prompt('请输入管理密码：', '');
+  if (pw === ADMIN_PASSWORD) {
+    adminMode = true;
+    document.getElementById('adminPanel').classList.add('show');
+    showToast('✅ 已进入管理后台');
+  } else if (pw !== null) {
+    showToast('❌ 密码错误');
   }
-});
+}
 
-input.addEventListener('keydown', function(e) {
+// ===== SEARCH (input-as-you-type, auto show) =====
+function onInput() {
+  const val = this.value.trim();
+  const clearBtn = document.getElementById('clearBtn');
+  const dropdown = document.getElementById('dropdown');
+  const card = document.getElementById('card');
+  const shareBar = document.getElementById('shareBar');
+  const hint = document.getElementById('emptyHint');
+
+  if (!val) { clearBtn.classList.remove('show'); dropdown.classList.remove('show'); card.classList.remove('show'); shareBar.style.display='none'; hint.style.display='block'; return; }
+  clearBtn.classList.add('show');
+  dropdownIndex = -1;
+
+  const matches = Object.keys(prices).filter(k => k.includes(val));
+  hint.style.display = 'none';
+
+  if (matches.length === 0) {
+    dropdown.classList.remove('show');
+    card.classList.remove('show');
+    shareBar.style.display = 'none';
+    hint.style.display = 'block';
+    hint.innerHTML = '<div class="icon">🤔</div><p>未找到该目的地的报价<br>请检查输入是否正确</p>';
+    return;
+  }
+
+  // Show dropdown
+  dropdown.innerHTML = matches.map((k, i) => `<div data-key="${k}" data-i="${i}">🚂 ${k}</div>`).join('');
+  dropdown.classList.add('show');
+
+  // Auto-show if exact match or single result
+  const exact = matches.find(k => k === val);
+  if (exact) {
+    showResult(exact);
+    dropdown.classList.remove('show');
+  } else if (matches.length === 1) {
+    showResult(matches[0]);
+    dropdown.classList.remove('show');
+  } else {
+    card.classList.remove('show');
+    shareBar.style.display = 'none';
+  }
+
+  // Bind dropdown clicks
+  dropdown.querySelectorAll('div').forEach(div => {
+    div.addEventListener('click', () => { showResult(div.dataset.key); dropdown.classList.remove('show'); });
+  });
+}
+
+function onKeydown(e) {
+  const dropdown = document.getElementById('dropdown');
   const items = dropdown.querySelectorAll('div');
-  if (e.key === 'ArrowDown') { e.preventDefault(); activeIdx = Math.min(activeIdx+1, items.length-1); updateActive(items); }
-  else if (e.key === 'ArrowUp') { e.preventDefault(); activeIdx = Math.max(activeIdx-1, 0); updateActive(items); }
-  else if (e.key === 'Enter' && activeIdx >= 0) { selectCity(items[activeIdx].dataset.key); }
-});
+  if (!dropdown.classList.contains('show') || !items.length) return;
+
+  if (e.key === 'ArrowDown') { e.preventDefault(); dropdownIndex = (dropdownIndex+1) % items.length; updateActive(items); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); dropdownIndex = (dropdownIndex-1+items.length) % items.length; updateActive(items); }
+  else if (e.key === 'Enter') { e.preventDefault(); if (dropdownIndex>=0) { showResult(items[dropdownIndex].dataset.key); dropdown.classList.remove('show'); } }
+  else if (e.key === 'Escape') { dropdown.classList.remove('show'); }
+}
 
 function updateActive(items) {
-  items.forEach((el, i) => el.classList.toggle('active', i === activeIdx));
+  items.forEach((el, i) => el.classList.toggle('active', i === dropdownIndex));
+  if (items[dropdownIndex]) items[dropdownIndex].scrollIntoView({ block: 'nearest' });
 }
 
-function selectCity(key) {
-  input.value = key;
-  dropdown.style.display = 'none';
-  showResult(key);
-}
-
+// ===== SHOW RESULT =====
 function showResult(key) {
-  const data = currentData[key];
+  const data = prices[key];
   if (!data) return;
-  initHint.style.display = 'none';
-  emptyState.style.display = 'none';
-  // 算每吨单价，找最低
-  const arr = Object.keys(data).map(t => ({ type: t, ...data[t], perTon: data[t]['价格'] / data[t]['吨位'] }));
-  const minPerTon = Math.min(...arr.map(a => a.perTon));
-  document.getElementById('cardTitle').textContent = `🚂 ${key} · 运费报价`;
-  document.getElementById('cardCount').textContent = `${arr.length}种车型`;
-  document.getElementById('cardBody').innerHTML = arr.map(a => `
-    <div class="row${a.perTon === minPerTon ? ' best' : ''}">
+  const card = document.getElementById('card');
+  const title = document.getElementById('cardTitle');
+  const count = document.getElementById('cardCount');
+  const body = document.getElementById('cardBody');
+  const shareBar = document.getElementById('shareBar');
+  const hint = document.getElementById('emptyHint');
+
+  // Find lowest unit price
+  let minUnit = Infinity, minType = '';
+  Object.keys(data).forEach(t => { const u = data[t]['价格']/data[t]['吨位']; if (u < minUnit) { minUnit = u; minType = t; } });
+
+  title.textContent = `🚂 ${key}`;
+  count.textContent = `${Object.keys(data).length} 种车型`;
+  body.innerHTML = Object.keys(data).map(t => {
+    const item = data[t];
+    const unit = (item['价格']/item['吨位']).toFixed(2);
+    const star = t === minType ? '<span class="star">⭐</span> ' : '';
+    return `<div class="row">
       <div class="left">
-        <span class="train-icon">🚂</span>
-        <div class="type-info">
-          <div class="type-name">${a.type}</div>
-          <div class="type-detail">吨位：${a['吨位']} 吨</div>
-        </div>
+        <div class="type">${star}${t}</div>
+        <div class="detail">吨位：${item['吨位']} 吨 · 单价：¥${unit}/吨</div>
       </div>
-      <div class="right">
-        <div class="price">¥${formatNum(a['价格'])}</div>
-        <div class="per-ton">¥${a.perTon.toFixed(1)}/吨</div>
+      <div style="text-align:right;">
+        <div class="price">¥${formatNum(item['价格'])}</div>
+        ${t===minType ? '<div class="unit-price" style="color:#faad14;">最低单价</div>' : ''}
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
+
   card.classList.add('show');
-  bottomBar.classList.add('show');
+  shareBar.style.display = 'flex';
+  hint.style.display = 'none';
+  document.getElementById('searchInput').value = key;
+  document.getElementById('clearBtn').classList.add('show');
 }
 
-function formatNum(n) { return Number(n).toLocaleString('zh-CN', {minimumFractionDigits:0, maximumFractionDigits:1}); }
+function formatNum(n) { return Number(n).toLocaleString('zh-CN', { minimumFractionDigits: 0, maximumFractionDigits: 1 }); }
 
-// ========== 分享功能 ==========
+// ===== SHARE =====
 function copyLink() {
   const url = location.href;
-  if (navigator.clipboard) { navigator.clipboard.writeText(url).then(() => toast("✅ 链接已复制")); }
-  else { const ta = document.createElement('textarea'); ta.value = url; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); toast("✅ 链接已复制"); }
+  if (navigator.clipboard) { navigator.clipboard.writeText(url).then(()=>showToast('✅ 链接已复制')).catch(()=>fallbackCopy(url)); }
+  else fallbackCopy(url);
 }
+function fallbackCopy(t) { const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('✅ 链接已复制'); }
 
 function showQR() {
   const url = encodeURIComponent(location.href);
-  document.getElementById('qrCode').innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${url}" alt="QR">`;
-  document.getElementById('qrUrl').textContent = location.href;
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${url}`;
+  const wrap = document.getElementById('qrWrap');
+  wrap.innerHTML = `<img src="${qrUrl}" alt="二维码" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="qr-fallback" style="display:none;">二维码加载中...</div><p>${location.href}</p>`;
   document.getElementById('qrModal').classList.add('show');
 }
-function hideQR() { document.getElementById('qrModal').classList.remove('show'); }
 
-function shareWechat() {
-  if (navigator.share) { navigator.share({ title: '运费报价查询', url: location.href }).catch(()=>{}); }
-  else { copyLink(); toast("📋 链接已复制，请到微信粘贴分享"); }
+function wechatShare() {
+  if (navigator.share) { navigator.share({ title:'运费报价查询', url:location.href }).catch(()=>{}); }
+  else { copyLink(); showToast('请粘贴链接到微信发送'); }
 }
 
-// ========== Toast ==========
-function toast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2000);
+// ===== ADMIN: LIST =====
+function renderAdminList() {
+  const list = document.getElementById('adminList');
+  const keys = Object.keys(prices).sort();
+  list.innerHTML = keys.length ? keys.map(k => {
+    const types = Object.keys(prices[k]).join(' / ');
+    return `<div class="admin-item">
+      <div class="info">
+        <div class="name">🚂 ${k}</div>
+        <div class="types">${types}</div>
+      </div>
+      <div class="actions">
+        <button class="edit-btn" onclick="openForm('${k}')">✏️ 编辑</button>
+        <button class="del-btn" onclick="deleteItem('${k}')">🗑️ 删除</button>
+      </div>
+    </div>`;
+  }).join('') : '<div class="empty"><p>暂无数据，点击"新增省市"开始录入</p></div>';
 }
 
-// ========== 管理后台 ==========
-let clickCount = 0;
-let isAdmin = false;
-let editingCity = null;
-
-function handleVersionClick() {
-  clickCount++;
-  if (clickCount >= 5) { clickCount = 0; openLogin(); }
-  setTimeout(() => { if (clickCount > 0 && clickCount < 5) clickCount = 0; }, 2000);
+function deleteItem(key) {
+  if (!confirm(`确定删除「${key}」吗？`)) return;
+  delete prices[key];
+  saveData();
+  addLog(`删除省市：${key}`);
+  renderAdminList();
+  showToast(`已删除「${key}」`);
 }
 
-function openLogin() {
-  document.getElementById('loginPwd').value = '';
-  document.getElementById('loginError').style.display = 'none';
-  document.getElementById('loginModal').classList.add('show');
-  setTimeout(() => document.getElementById('loginPwd').focus(), 100);
-}
+// ===== ADMIN: FORM =====
+function openForm(key) {
+  editKey = key;
+  const form = document.getElementById('editForm');
+  const title = document.getElementById('formTitle');
+  const nameInput = document.getElementById('formName');
+  const typesDiv = document.getElementById('formTypes');
 
-function doLogin() {
-  const pwd = document.getElementById('loginPwd').value;
-  if (pwd === ADMIN_PASSWORD) {
-    isAdmin = true;
-    document.getElementById('loginModal').classList.remove('show');
-    enterAdmin();
+  form.classList.add('show');
+  if (key) {
+    title.textContent = `编辑：${key}`;
+    nameInput.value = key;
+    const data = prices[key];
+    typesDiv.innerHTML = '';
+    Object.keys(data).forEach(t => addTypeRow(t, data[t]['价格'], data[t]['吨位']));
   } else {
-    document.getElementById('loginError').style.display = 'block';
+    title.textContent = '新增省市';
+    nameInput.value = '';
+    typesDiv.innerHTML = '';
+    addTypeRow('', '', '');
   }
 }
 
-function enterAdmin() {
-  document.getElementById('mainHeader').style.display = 'none';
-  document.getElementById('searchBox').style.display = 'none';
-  document.getElementById('card').classList.remove('show');
-  document.getElementById('emptyState').style.display = 'none';
-  document.getElementById('initHint').style.display = 'none';
-  document.getElementById('bottomBar').classList.remove('show');
-  document.getElementById('adminPanel').classList.add('show');
-  renderCityList();
-  renderLogs();
+function addTypeRow(name='', price='', ton='') {
+  const div = document.getElementById('formTypes');
+  const row = document.createElement('div');
+  row.className = 'type-row';
+  row.innerHTML = `<input placeholder="车型名称（如：整车）" value="${name}" class="t-name">
+    <input placeholder="价格" type="number" step="0.1" value="${price}" class="t-price" style="max-width:110px;">
+    <input placeholder="吨位" type="number" value="${ton}" class="t-ton" style="max-width:90px;">
+    <button type="button" onclick="this.parentElement.remove()">删除</button>`;
+  div.appendChild(row);
 }
 
-function exitAdmin() {
-  isAdmin = false;
-  document.getElementById('adminPanel').classList.remove('show');
-  document.getElementById('editForm').style.display = 'none';
-  document.getElementById('mainHeader').style.display = 'block';
-  document.getElementById('searchBox').style.display = 'block';
-  document.getElementById('initHint').style.display = 'block';
-  input.value = '';
+function saveForm() {
+  const name = document.getElementById('formName').value.trim();
+  if (!name) return showToast('请输入省市名称');
+
+  const rows = document.querySelectorAll('#formTypes .type-row');
+  if (!rows.length) return showToast('请至少添加一个车型');
+
+  const data = {};
+  for (const row of rows) {
+    const tname = row.querySelector('.t-name').value.trim();
+    const tprice = parseFloat(row.querySelector('.t-price').value);
+    const tton = parseFloat(row.querySelector('.t-ton').value);
+    if (!tname) return showToast('车型名称不能为空');
+    if (isNaN(tprice) || isNaN(tton)) return showToast(`「${tname}」价格或吨位无效`);
+    data[tname] = { '价格': tprice, '吨位': tton };
+  }
+
+  const isEdit = editKey !== null;
+  if (isEdit && editKey !== name) delete prices[editKey];
+  prices[name] = data;
+  saveData();
+  addLog(`${isEdit?'编辑':'新增'}省市：${name}（${Object.keys(data).join('/')}）`);
+  renderAdminList();
+  document.getElementById('editForm').classList.remove('show');
+  showToast(`✅ 已${isEdit?'更新':'新增'}「${name}」`);
 }
 
-function renderCityList() {
-  currentData = getPrices();
-  const keys = Object.keys(currentData).sort();
-  document.getElementById('cityList').innerHTML = keys.length ? keys.map(k => {
-    const types = Object.keys(currentData[k]);
-    return `<div class="city-card">
-      <div class="city-card-header">
-        <span class="city-name">🚂 ${k}</span>
-        <span class="city-actions">
-          <button onclick="editCity('${k}')">✏️</button>
-          <button onclick="deleteCity('${k}')">🗑️</button>
-        </span>
-      </div>
-      <div class="city-types">${types.map(t => `<span class="tag">${t}</span>`).join('')}</div>
-    </div>`;
-  }).join('') : '<p style="text-align:center;color:#bbb;padding:20px;">暂无数据，点击「新增省市」开始录入</p>';
-}
-
-function showAddCity() {
-  editingCity = null;
-  document.getElementById('formCityName').value = '';
-  document.getElementById('typeRows').innerHTML = '';
-  addTypeRow('整车', 0, 0);
-  addTypeRow('敞顶箱', 0, 0);
-  document.getElementById('editForm').style.display = 'block';
-}
-
-function editCity(name) {
-  editingCity = name;
-  document.getElementById('formCityName').value = name;
-  document.getElementById('typeRows').innerHTML = '';
-  const data = currentData[name];
-  Object.keys(data).forEach(t => addTypeRow(t, data[t]['价格'], data[t]['吨位']));
-  document.getElementById('editForm').style.display = 'block';
-}
-
-function addTypeRow(typeName, price, ton) {
-  const div = document.createElement('div');
-  div.className = 'type-row';
-  div.innerHTML = `<input placeholder="车型名" value="${typeName||''}" class="r-type">
-    <input placeholder="价格" type="number" value="${price||''}" class="r-price">
-    <input placeholder="吨位" type="number" value="${ton||''}" class="r-ton">
-    <button class="remove-type" onclick="this.parentElement.remove()">✕</button>`;
-  document.getElementById('typeRows').appendChild(div);
-}
-
-function saveCity() {
-  const name = document.getElementById('formCityName').value.trim();
-  if (!name) { toast("⚠️ 请输入省市名称"); return; }
-  const rows = document.querySelectorAll('.type-row');
-  const types = {};
-  rows.forEach(r => {
-    const t = r.querySelector('.r-type').value.trim();
-    const p = parseFloat(r.querySelector('.r-price').value) || 0;
-    const n = parseFloat(r.querySelector('.r-ton').value) || 0;
-    if (t) types[t] = { "价格": p, "吨位": n };
-  });
-  if (Object.keys(types).length === 0) { toast("⚠️ 至少填一种车型"); return; }
-  currentData[name] = types;
-  setPrices(currentData);
-  const action = editingCity ? `编辑「${name}」` : `新增「${name}」`;
-  addLog(`${new Date().toLocaleString('zh-CN')} ${action}，车型：${Object.keys(types).join('/')}`);
-  toast("✅ 保存成功");
-  document.getElementById('editForm').style.display = 'none';
-  renderCityList();
-  renderLogs();
-}
-
-function deleteCity(name) {
-  if (!confirm(`确定删除「${name}」吗？`)) return;
-  delete currentData[name];
-  setPrices(currentData);
-  addLog(`${new Date().toLocaleString('zh-CN')} 删除「${name}」`);
-  toast("🗑️ 已删除");
-  renderCityList();
-  renderLogs();
-}
-
+// ===== ADMIN: EXPORT / IMPORT / RESET =====
 function exportData() {
-  const data = JSON.stringify(getPrices(), null, 2);
+  const data = JSON.stringify(prices, null, 2);
   const blob = new Blob([data], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = `运费报价备份_${new Date().toISOString().slice(0,10)}.json`;
   a.click();
   URL.revokeObjectURL(a.href);
-  addLog(`${new Date().toLocaleString('zh-CN')} 导出数据备份`);
-  renderLogs();
-  toast("⬇️ 备份已下载");
+  addLog('导出备份数据');
+  showToast('✅ 备份已下载');
 }
 
 function importData(e) {
@@ -564,38 +658,37 @@ function importData(e) {
   reader.onload = function(ev) {
     try {
       const data = JSON.parse(ev.target.result);
-      setPrices(data);
-      currentData = data;
-      addLog(`${new Date().toLocaleString('zh-CN')} 导入数据备份`);
-      renderCityList();
-      renderLogs();
-      toast("✅ 导入成功");
-    } catch(err) { toast("❌ 文件格式错误"); }
+      prices = data;
+      saveData();
+      addLog(`导入备份数据（${Object.keys(data).length}条）`);
+      renderAdminList();
+      showToast('✅ 导入成功');
+    } catch { showToast('❌ 文件格式错误'); }
   };
   reader.readAsText(file);
   e.target.value = '';
 }
 
 function resetData() {
-  if (!confirm("确定恢复为默认示例数据吗？当前数据会被覆盖！")) return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DATA));
-  currentData = JSON.parse(JSON.stringify(DEFAULT_DATA));
-  addLog(`${new Date().toLocaleString('zh-CN')} 恢复默认数据`);
-  renderCityList();
-  renderLogs();
-  toast("🔄 已恢复默认数据");
+  if (!confirm('确定恢复为默认示例数据吗？当前数据会被覆盖！')) return;
+  prices = { ...DEFAULT_DATA };
+  saveData();
+  addLog('重置为默认数据');
+  renderAdminList();
+  showToast('✅ 已恢复默认数据');
 }
 
-function renderLogs() {
-  const logs = getLogs();
-  document.getElementById('logList').innerHTML = logs.length ? logs.map(l => `<div class="log-item">${l.time} — ${l.msg}</div>`).join('') : '<p style="color:#ccc;font-size:12px;">暂无操作记录</p>';
+// ===== TOAST =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
 }
 
-// ========== 初始化 ==========
-// 首次访问写入默认数据
-if (!localStorage.getItem(STORAGE_KEY)) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DATA));
-}
+// ===== START =====
+init();
 </script>
 </body>
 </html>
+
